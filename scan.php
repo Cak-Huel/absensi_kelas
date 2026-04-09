@@ -1,5 +1,6 @@
 <!-- variable this->extend('templates/starting_page_layout') -->
 
+<link rel="stylesheet" href="assets\css\material-dashboard.css">
 <!-- variable this->section('navaction') -->
 <a href="/admin " class="btn btn-primary pull-right pl-3">
    <i class="material-icons mr-2">dashboard</i>
@@ -126,7 +127,7 @@
    const codeReader = new ZXing.BrowserMultiFormatReader();
    const sourceSelect = $('#pilihKamera');
 
-   $(document).on('change', '#pilihKamera', function () {
+   $(document).on('change', '#pilihKamera', function() {
       selectedDeviceId = $(this).val();
       if (codeReader && $('#toggleKamera').is(':checked')) {
          codeReader.reset();
@@ -134,7 +135,7 @@
       }
    })
 
-   $(document).on('change', '#toggleKamera', function () {
+   $(document).on('change', '#toggleKamera', function() {
       if (this.checked) {
          $('#cameraSection').slideDown();
          initScanner();
@@ -144,7 +145,7 @@
       }
    });
 
-   $(document).on('change', '#toggleRFID', function () {
+   $(document).on('change', '#toggleRFID', function() {
       if (this.checked) {
          $('#rfidSection').slideDown();
          $('#rfidInput').focus();
@@ -235,7 +236,7 @@
             'unique_code': code,
             'waktu': '123'
          },
-         success: function (response, status, xhr) {
+         success: function(response, status, xhr) {
             audio.play();
             console.log(response);
             $('#hasilScan').html(response);
@@ -244,7 +245,7 @@
                scrollTop: $("#hasilScan").offset().top
             }, 500);
          },
-         error: function (xhr, status, thrown) {
+         error: function(xhr, status, thrown) {
             console.log(thrown);
             $('#hasilScan').html(thrown);
          }
@@ -256,7 +257,7 @@
    }
 
    // RFID Listener
-   $('#rfidInput').on('keypress', function (e) {
+   $('#rfidInput').on('keypress', function(e) {
       if (e.which == 13) {
          let code = $(this).val().trim();
          if (code.length > 0) {
@@ -267,7 +268,7 @@
       }
    });
 
-   $(document).ready(function () {
+   $(document).ready(function() {
       const rfidInput = $('#rfidInput');
       const statusBadge = $('#statusBadge');
       const statusText = $('#statusText');
@@ -291,11 +292,11 @@
          updateStatus(false);
       }
 
-      rfidInput.on('focus', function () {
+      rfidInput.on('focus', function() {
          updateStatus(true);
       });
 
-      rfidInput.on('blur', function () {
+      rfidInput.on('blur', function() {
          updateStatus(false);
          // Auto refocus after a short delay if not focusing on other inputs
          setTimeout(() => {
@@ -306,7 +307,7 @@
       });
 
       // Ensure focus remains on rfidInput if clicked elsewhere (except camera select)
-      $(document).on('click', function (e) {
+      $(document).on('click', function(e) {
          if ($('#toggleRFID').is(':checked') && !$(e.target).closest('#pilihKamera, #toggleKamera, #toggleRFID').length) {
             rfidInput.focus();
          }
