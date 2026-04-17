@@ -1,131 +1,262 @@
+<?php
+session_start();
+
+// Redirect jika sudah login
+if (isset($_SESSION['student_id'])) {
+    header('Location: dashboard.php');
+    exit;
+}
+
+// Dummy login handler (replace dengan database nanti)
+$error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nis = $_POST['nis'] ?? '';
+    $password = $_POST['password'] ?? '';
+
+    // Dummy validation - ganti dengan query database
+    if ($nis === '12345' && $password === 'siswa123') {
+        $_SESSION['student_id'] = $nis;
+        $_SESSION['student_name'] = 'Ahmad Fauzi';
+        $_SESSION['student_class'] = 'XII IPA 1';
+        header('Location: dashboard.php');
+        exit;
+    } else {
+        $error = 'NIS atau password salah';
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Absensi Kelas</title>
+    <title>Login - Sistem Absensi Siswa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS Langsung di dalam file PHP */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        :root {
+            --background: #fafafa;
+            --foreground: #0a0a0a;
+            --card: #ffffff;
+            --card-foreground: #0a0a0a;
+            --primary: #0a0a0a;
+            --primary-foreground: #fafafa;
+            --muted: #f5f5f5;
+            --muted-foreground: #737373;
+            --border: #e5e5e5;
+            --input: #e5e5e5;
+            --ring: #0a0a0a;
+            --radius: 0.75rem;
         }
 
         body {
-            background: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--foreground);
             min-height: 100vh;
-            color: #1c1e21;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
         }
 
-        .container {
-            max-width: 800px;
-            width: 95%;
-            padding: 20px;
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-header {
             text-align: center;
+            margin-bottom: 2.5rem;
         }
 
-        header {
-            margin-bottom: 40px;
+        .logo {
+            width: 48px;
+            height: 48px;
+            background-color: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
         }
 
-        header h1 {
-            font-size: 2rem;
-            color: #1877f2;
-            margin-bottom: 8px;
+        .logo svg {
+            width: 24px;
+            height: 24px;
+            color: var(--primary-foreground);
         }
 
-        header p {
-            color: #606770;
+        .login-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
         }
 
-        .grid-menu {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+        .login-header p {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
         }
 
-        .card {
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 15px;
-            text-decoration: none;
-            color: inherit;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            border: 1px solid #ddd;
+        .login-card {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
         }
 
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
-            border-color: #1877f2;
+        .form-group {
+            margin-bottom: 1.25rem;
         }
 
-        .card .emoji {
-            font-size: 40px;
-            margin-bottom: 15px;
+        .form-label {
             display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--foreground);
         }
 
-        .card h3 {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: #1c1e21;
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            border: 1px solid var(--input);
+            border-radius: calc(var(--radius) - 4px);
+            background-color: var(--background);
+            color: var(--foreground);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: inherit;
         }
 
-        .card p {
-            font-size: 0.9rem;
-            color: #65676b;
-            line-height: 1.4;
+        .form-input:focus {
+            outline: none;
+            border-color: var(--ring);
+            box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
         }
 
-        footer {
-            margin-top: 50px;
-            font-size: 0.85rem;
-            color: #8a8d91;
+        .form-input::placeholder {
+            color: var(--muted-foreground);
+        }
+
+        .error-message {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 0.75rem 1rem;
+            border-radius: calc(var(--radius) - 4px);
+            font-size: 0.875rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--primary-foreground);
+            background-color: var(--primary);
+            border: none;
+            border-radius: calc(var(--radius) - 4px);
+            cursor: pointer;
+            transition: opacity 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .demo-info {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: var(--muted);
+            border-radius: calc(var(--radius) - 4px);
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
+        }
+
+        .demo-info strong {
+            color: var(--foreground);
+            font-weight: 500;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
         }
     </style>
 </head>
 
 <body>
-
-    <div class="container">
-        <header>
-            <h1>Sistem Absensi Kelas</h1>
-            <p>Silakan pilih modul akses untuk melanjutkan</p>
-        </header>
-
-        <div class="grid-menu">
-            <a href="admin_login.php" class="card">
-                <span class="emoji">🛡️</span>
-                <h3>Admin Area</h3>
-                <p>Login sebagai administrator untuk kelola data.</p>
-            </a>
-
-            <a href="scan.php" class="card">
-                <span class="emoji">📷</span>
-                <h3>Scan Presensi</h3>
-                <p>Gunakan QR Code untuk mencatat kehadiran.</p>
-            </a>
-
-            <a href="teacher_dashboard.php" class="card">
-                <span class="emoji">👨‍🏫</span>
-                <h3>Panel Guru</h3>
-                <p>Dashboard khusus guru dan wali kelas.</p>
-            </a>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                </svg>
+            </div>
+            <h1>Sistem Absensi Siswa</h1>
+            <p>Masuk dengan akun siswa Anda</p>
         </div>
 
-        <footer>
-            &copy; <?php echo date("Y"); ?> Absensi Kelas App • Developed with PHP
-        </footer>
-    </div>
+        <div class="login-card">
+            <?php if ($error): ?>
+                <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
 
+            <form method="POST" action="">
+                <div class="form-group">
+                    <label class="form-label" for="nis">NIS (Nomor Induk Siswa)</label>
+                    <input
+                        type="text"
+                        id="nis"
+                        name="nis"
+                        class="form-input"
+                        placeholder="Masukkan NIS"
+                        required
+                        autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-input"
+                        placeholder="Masukkan password"
+                        required
+                        autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn-primary">Masuk</button>
+            </form>
+
+            <div class="demo-info">
+                <strong>Demo Account:</strong><br>
+                NIS: 12345<br>
+                Password: siswa123
+            </div>
+        </div>
+
+        <p class="footer-text">© 2026 Sistem Absensi Sekolah</p>
+    </div>
 </body>
 
 </html>
