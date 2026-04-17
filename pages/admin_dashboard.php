@@ -1,3 +1,11 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['admin_id'])) {
+  header('Location: ../index.php');
+  exit;
+}
+?>
 <!doctype html>
 <html lang="id">
 
@@ -5,21 +13,14 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta
-    name="description"
-    content="Absensi Sekolah QR Code - Sistem absensi modern berbasis QR Code" />
+  <meta name="description" content="Absensi Sekolah QR Code - Sistem absensi modern berbasis QR Code" />
   <meta name="theme-color" content="#9c27b0" />
 
-  <link
-    rel="apple-touch-icon"
-    sizes="76x76"
-    href="assets/img/apple-icon.png" />
+  <link rel="apple-touch-icon" sizes="76x76" href="assets/img/apple-icon.png" />
   <link rel="icon" type="image/png" href="assets/img/favicon.png" />
-  <link
-    rel="stylesheet"
-    type="text/css"
+  <link rel="stylesheet" type="text/css"
     href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons" />
-  <link rel="stylesheet" href="assets/css/material-dashboard.css" />
+  <link rel="stylesheet" href="../assets/css/material-dashboard.css" />
 
   <!-- variable this->include('templates/css') -->
 
@@ -28,10 +29,7 @@
 
 <body>
   <div>
-    <div
-      class="sidebar"
-      data-color="<!-- variable sidebarColor -->"
-      data-image="assets/img/sidebar/sidebar-3.jpg">
+    <div class="sidebar" data-color="<!-- variable sidebarColor -->" data-image="assets/img/sidebar/sidebar-3.jpg">
       <!-- data-background-color="black/red" -->
       <!--
         Tip 1: You can change the color of the sidebar using: data-color="purple | azure | green | orange | danger"
@@ -47,8 +45,7 @@
       </div>
       <div class="sidebar-wrapper">
         <ul class="nav">
-          <li
-            class="nav-item <!-- variable context == $item['context'] ? 'active' : '' -->">
+          <li class="nav-item <!-- variable context == $item['context'] ? 'active' : '' -->">
             <a class="nav-link font-weight-bold" href="$item['url']">
               <i class="material-icons"><!-- variable item['icon'] --></i>
               <p><!-- variable item['title'] --></p>
@@ -59,21 +56,15 @@
     </div>
     <div class="main-panel">
       <!-- Navbar -->
-      <nav
-        class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top">
+      <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top">
         <div class="container-fluid">
           <div class="navbar-wrapper">
             <p class="navbar-brand my-auto">
               <b><!-- variable title --></b>
             </p>
           </div>
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            aria-controls="navigation-index"
-            aria-expanded="false"
-            aria-label="Toggle navigation">
+          <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index"
+            aria-expanded="false" aria-label="Toggle navigation">
             <span class="sr-only">Toggle navigation</span>
             <span class="navbar-toggler-icon icon-bar">12</span>
             <span class="navbar-toggler-icon icon-bar">12</span>
@@ -99,38 +90,24 @@
                </a>
             </li>-->
             <li class="nav-item dropdown">
-              <a
-                class="nav-link"
-                href="javascript:;"
-                id="navbarDropdownScan"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false">
+              <a class="nav-link" href="javascript:;" id="navbarDropdownScan" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
                 <i class="material-icons">qr_code</i>
                 <p class="d-lg-none d-md-block">Scan</p>
               </a>
-              <div
-                class="dropdown-menu dropdown-menu-right"
-                aria-labelledby="navbarDropdownScan">
+              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownScan">
                 <a class="dropdown-item" href="scan/masuk">Absen masuk</a>
                 <a class="dropdown-item" href="scan/pulang">Absen pulang</a>
               </div>
             </li>
             <li class="nav-item dropdown">
-              <a
-                class="nav-link <?= is_superadmin() ? 'text-danger' : ''; ?>"
-                href="javascript:;"
-                id="navbarDropdownProfile"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false">
+              <a class="nav-link <?= is_superadmin() ? 'text-danger' : ''; ?>" href="javascript:;"
+                id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="material-icons">person</i>
                 <p class="d-lg-none d-md-block">Account</p>
                 <span>User : 123</span>
               </a>
-              <div
-                class="dropdown-menu dropdown-menu-right"
-                aria-labelledby="navbarDropdownProfile">
+              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
                 <a class="dropdown-item" href="#"> Email: 123 </a>
                 <a class="dropdown-item" href="#">
                   Role:
@@ -328,9 +305,7 @@
             <div class="col-lg-6">
               <div class="card">
                 <div class="card-header card-header-primary">
-                  <div
-                    class="d-flex flex-wrap align-items-center justify-content-between"
-                    style="gap: 12px">
+                  <div class="d-flex flex-wrap align-items-center justify-content-between" style="gap: 12px">
                     <div>
                       <h4 class="card-title">
                         <b id="titleSiswaStats">Absensi Siswa Hari Ini</b>
@@ -339,27 +314,19 @@
                     </div>
                     <!-- FILTER KELAS -->
                     <div class="text-right">
-                      <div
-                        class="d-flex align-items-center justify-content-end">
+                      <div class="d-flex align-items-center justify-content-end">
                         <div id="filterLoader" style="display: none">
-                          <div
-                            class="spinner-border spinner-border-sm text-primary"
-                            role="status">
+                          <div class="spinner-border spinner-border-sm text-primary" role="status">
                             <span class="sr-only">Loading...</span>
                           </div>
                         </div>
                         <div>
-                          <select
-                            name="id_kelas"
-                            id="filterKelas"
-                            class="custom-select">
+                          <select name="id_kelas" id="filterKelas" class="custom-select">
                             <option value="">
                               -- Semua Kelas (123 siswa) --
                             </option>
 
-                            <option
-                              value="<!-- variable k['id_kelas'] -->"
-                              data-kelas="<!-- variable k['kelas'] -->">
+                            <option value="<!-- variable k['id_kelas'] -->" data-kelas="<!-- variable k['kelas'] -->">
                               <!-- variable k['kelas'] -->
                               (
                               <!-- variable k['jumlah_siswa'] ?? 0 -->
@@ -374,13 +341,13 @@
                 <div class="card-body" id="siswaStatsContainer">
                   <?= view('admin/_dashboard_siswa_stats', [
                     'hadir' =>
-                    $jumlahKehadiranSiswa['hadir'],
+                      $jumlahKehadiranSiswa['hadir'],
                     'sakit' =>
-                    $jumlahKehadiranSiswa['sakit'],
+                      $jumlahKehadiranSiswa['sakit'],
                     'izin' =>
-                    $jumlahKehadiranSiswa['izin'],
+                      $jumlahKehadiranSiswa['izin'],
                     'alfa' =>
-                    $jumlahKehadiranSiswa['alfa'],
+                      $jumlahKehadiranSiswa['alfa'],
                     'totalSiswa' => $totalSiswa
                   ]) ?>
                 </div>
@@ -420,9 +387,7 @@
                       </h4>
                     </div>
                     <div class="col-1">
-                      <div
-                        class="border-right mx-auto h-100"
-                        style="width: 0"></div>
+                      <div class="border-right mx-auto h-100" style="width: 0"></div>
                     </div>
                     <div class="col-2 col-sm-3">
                       <h5 class="text-primary text-nowrap"><b>Total</b></h5>
@@ -492,8 +457,7 @@
           <nav class="float-left">
             <ul>
               <li>
-                <a
-                  href="https://github.com/ikhsan3adi/absensi-sekolah-qr-code">
+                <a href="https://github.com/ikhsan3adi/absensi-sekolah-qr-code">
                   Github
                 </a>
               </li>
@@ -512,22 +476,16 @@
   <!--   Core JS Files   -->
   <script src="assets/js/core/jquery-3.5.1.min.js?v=' . $assetVersion"></script>
   <!-- Custom Plugins Sweetalert, Cookies, Etc -->
-  <script
-    src="assets/js/plugins.js?v=' . $assetVersion"
-    type="text/javascript"></script>
+  <script src="assets/js/plugins.js?v=' . $assetVersion" type="text/javascript"></script>
   <script src="assets/js/core/bootstrap.bundle.min.js?v=' . $assetVersion"></script>
   <script src="assets/js/core/popper.min.js?v=' . $assetVersion"></script>
   <script src="assets/js/core/bootstrap-material-design.min.js?v=' . $assetVersion"></script>
   <script src="assets/js/plugins/perfect-scrollbar.jquery.min.js?v=' . $assetVersion"></script>
   <script src="assets/js/plugins/nouislider.min.js?v=' . $assetVersion"></script>
-  <script
-    src="assets/js/material-dashboard.js?v=' . $assetVersion"
-    type="text/javascript"></script>
+  <script src="assets/js/material-dashboard.js?v=' . $assetVersion" type="text/javascript"></script>
   <script src="assets/js/plugins/file-uploader/js/jquery.dm-uploader.min.js?v=' . $assetVersion"></script>
   <script src="assets/js/plugins/file-uploader/js/ui.js?v=' . $assetVersion"></script>
-  <script
-    src="assets/js/custom.js?v=' . $assetVersion"
-    type="text/javascript"></script>
+  <script src="assets/js/custom.js?v=' . $assetVersion" type="text/javascript"></script>
 
   <script>
     var BaseConfig = {
@@ -571,45 +529,45 @@
         data: {
           labels: chartLabels,
           datasets: [{
-              label: "Hadir",
-              data: data.hadir,
-              borderColor: chartColors.hadir.border,
-              backgroundColor: chartColors.hadir.bg,
-              tension: 0.3,
-              fill: false,
-              pointRadius: 4,
-              pointHoverRadius: 6,
-            },
-            {
-              label: "Sakit",
-              data: data.sakit,
-              borderColor: chartColors.sakit.border,
-              backgroundColor: chartColors.sakit.bg,
-              tension: 0.3,
-              fill: false,
-              pointRadius: 4,
-              pointHoverRadius: 6,
-            },
-            {
-              label: "Izin",
-              data: data.izin,
-              borderColor: chartColors.izin.border,
-              backgroundColor: chartColors.izin.bg,
-              tension: 0.3,
-              fill: false,
-              pointRadius: 4,
-              pointHoverRadius: 6,
-            },
-            {
-              label: "Alfa",
-              data: data.alfa,
-              borderColor: chartColors.alfa.border,
-              backgroundColor: chartColors.alfa.bg,
-              tension: 0.3,
-              fill: false,
-              pointRadius: 4,
-              pointHoverRadius: 6,
-            },
+            label: "Hadir",
+            data: data.hadir,
+            borderColor: chartColors.hadir.border,
+            backgroundColor: chartColors.hadir.bg,
+            tension: 0.3,
+            fill: false,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+          },
+          {
+            label: "Sakit",
+            data: data.sakit,
+            borderColor: chartColors.sakit.border,
+            backgroundColor: chartColors.sakit.bg,
+            tension: 0.3,
+            fill: false,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+          },
+          {
+            label: "Izin",
+            data: data.izin,
+            borderColor: chartColors.izin.border,
+            backgroundColor: chartColors.izin.bg,
+            tension: 0.3,
+            fill: false,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+          },
+          {
+            label: "Alfa",
+            data: data.alfa,
+            borderColor: chartColors.alfa.border,
+            backgroundColor: chartColors.alfa.bg,
+            tension: 0.3,
+            fill: false,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+          },
           ],
         },
         options: {
@@ -640,7 +598,7 @@
               padding: 12,
               cornerRadius: 8,
               callbacks: {
-                label: function(context) {
+                label: function (context) {
                   return (
                     context.dataset.label + ": " + context.parsed.y + " orang"
                   );
@@ -654,7 +612,7 @@
               beginAtZero: true,
               ticks: {
                 stepSize: 1,
-                callback: function(value) {
+                callback: function (value) {
                   if (Number.isInteger(value)) return value;
                 },
               },
@@ -710,10 +668,10 @@
       }
     }
 
-    $(document).ready(function() {
+    $(document).ready(function () {
       initDashboardPageCharts();
 
-      $("#filterKelas").on("change", function() {
+      $("#filterKelas").on("change", function () {
         const idKelas = $(this).val();
         const loader = $("#filterLoader");
 
@@ -725,7 +683,7 @@
           data: setAjaxData({
             id_kelas: idKelas
           }),
-          success: function(response) {
+          success: function (response) {
             const obj = JSON.parse(response);
             if (obj.result == 1) {
               $("#siswaStatsContainer").html(obj.htmlContent);
@@ -742,10 +700,10 @@
               // }
             }
           },
-          error: function(xhr, status, thrown) {
+          error: function (xhr, status, thrown) {
             console.error(thrown);
           },
-          complete: function() {
+          complete: function () {
             loader.hide();
           },
         });
