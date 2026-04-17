@@ -3,7 +3,7 @@ session_start();
 
 // Redirect jika sudah login
 if (isset($_SESSION['student_id'])) {
-    header('Location: dashboard.php');
+    header('Location: pages/dashboard.php');
     exit;
 }
 
@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['student_id'] = $nis;
         $_SESSION['student_name'] = 'Ahmad Fauzi';
         $_SESSION['student_class'] = 'XII IPA 1';
-        header('Location: dashboard.php');
+        header('Location: pages/dashboard.php');
         exit;
     } else {
         $error = 'NIS atau password salah';
