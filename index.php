@@ -6,22 +6,33 @@ if (isset($_SESSION['student_id'])) {
     header('Location: pages/dashboard.php');
     exit;
 }
+if (isset($_SESSION['admin_id'])) {
+    header('Location: pages/admin_dashboard.php');
+    exit;
+}
 
 // Dummy login handler (replace dengan database nanti)
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nis = $_POST['nis'] ?? '';
+    $identifier = $_POST['identifier'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // Dummy validation - ganti dengan query database
-    if ($nis === '12345' && $password === 'siswa123') {
-        $_SESSION['student_id'] = $nis;
+    // Dummy validation untuk admin
+    if ($identifier === 'admin' && $password === 'admin123') {
+        $_SESSION['admin_id'] = 1;
+        $_SESSION['admin_name'] = 'Administrator';
+        header('Location: pages/admin_dashboard.php');
+        exit;
+    }
+    // Dummy validation untuk siswa - ganti dengan query database
+    elseif ($identifier === '12345' && $password === 'siswa123') {
+        $_SESSION['student_id'] = $identifier;
         $_SESSION['student_name'] = 'Ahmad Fauzi';
         $_SESSION['student_class'] = 'XII IPA 1';
         header('Location: pages/dashboard.php');
         exit;
     } else {
-        $error = 'NIS atau password salah';
+        $error = 'NIS/Username atau password salah';
     }
 }
 ?>
@@ -211,8 +222,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
             </div>
-            <h1>Sistem Absensi Siswa</h1>
-            <p>Masuk dengan akun siswa Anda</p>
+            <h1>Sistem Absensi Sekolah</h1>
+            <p>Masuk dengan akun siswa atau administrator</p>
         </div>
 
         <div class="login-card">
@@ -222,13 +233,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form method="POST" action="">
                 <div class="form-group">
-                    <label class="form-label" for="nis">NIS (Nomor Induk Siswa)</label>
+                    <label class="form-label" for="identifier">NIS / Username</label>
                     <input
                         type="text"
-                        id="nis"
-                        name="nis"
+                        id="identifier"
+                        name="identifier"
                         class="form-input"
-                        placeholder="Masukkan NIS"
+                        placeholder="Masukkan NIS atau Username"
                         required
                         autocomplete="username">
                 </div>
@@ -249,9 +260,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
 
             <div class="demo-info">
-                <strong>Demo Account:</strong><br>
+                <strong>Demo Akun Siswa:</strong><br>
                 NIS: 12345<br>
-                Password: siswa123
+                Password: siswa123<br><br>
+                <strong>Demo Akun Admin:</strong><br>
+                Username: admin<br>
+                Password: admin123
             </div>
         </div>
 
