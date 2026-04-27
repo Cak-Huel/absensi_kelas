@@ -47,6 +47,17 @@
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 min-h-screen"
       x-data="dashboard()" x-init="initDashboard()">
 
+    <!-- Loading Screen -->
+    <div x-show="isLoadingPage" class="fixed inset-0 z-50 bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+        <div class="text-center">
+            <svg class="animate-spin h-10 w-10 text-brand-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-slate-500">Memuat data...</p>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="sticky top-0 z-40 glass shadow-sm dark:shadow-black/20">
         <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -76,7 +87,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-3xl mx-auto px-4 py-8 space-y-6">
+    <main x-show="!isLoadingPage" class="max-w-3xl mx-auto px-4 py-8 space-y-6">
         
         <!-- Greeting Section -->
         <div class="mb-8">
@@ -91,7 +102,10 @@
             <div>
                 <h3 class="font-bold text-xl mb-1" x-text="userName"></h3>
                 <p class="text-sm text-slate-500 dark:text-slate-400">
-                    <span x-text="studentId"></span> &bull; <span x-text="studentClass"></span>
+                    NISN: <span x-text="studentId"></span> &bull; <span x-text="studentClass"></span>
+                </p>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1" x-show="studentGender">
+                    <span x-text="studentGender"></span>
                 </p>
             </div>
         </div>
@@ -134,15 +148,15 @@
         <!-- Stats Grid -->
         <div class="grid grid-cols-3 gap-4">
             <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-xl shadow-slate-200/40 dark:shadow-black/20 border border-slate-100 dark:border-slate-700/50 text-center">
-                <div class="text-3xl font-bold text-brand-900 dark:text-white mb-1">24</div>
+                <div class="text-3xl font-bold text-brand-900 dark:text-white mb-1" x-text="stats.hadir">0</div>
                 <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Hadir</div>
             </div>
             <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-xl shadow-slate-200/40 dark:shadow-black/20 border border-slate-100 dark:border-slate-700/50 text-center">
-                <div class="text-3xl font-bold text-amber-500 mb-1">2</div>
+                <div class="text-3xl font-bold text-amber-500 mb-1" x-text="stats.izin">0</div>
                 <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Izin</div>
             </div>
             <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-xl shadow-slate-200/40 dark:shadow-black/20 border border-slate-100 dark:border-slate-700/50 text-center">
-                <div class="text-3xl font-bold text-rose-500 mb-1">1</div>
+                <div class="text-3xl font-bold text-rose-500 mb-1" x-text="stats.sakit">0</div>
                 <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sakit</div>
             </div>
         </div>
@@ -169,9 +183,7 @@
                 <!-- Scanner View -->
                 <div x-show="!scanSuccess" class="relative aspect-square bg-slate-100 dark:bg-slate-900 rounded-2xl overflow-hidden flex items-center justify-center">
                     <div class="absolute inset-10 border-2 border-brand-500 rounded-xl z-10 opacity-50"></div>
-                    <!-- Simulate Camera -->
                     <div class="absolute inset-0 bg-slate-800 animate-pulse opacity-10"></div>
-                    
                     <div class="text-center z-20 text-slate-500 dark:text-slate-400">
                         <svg class="w-12 h-12 mx-auto mb-3 opacity-50 animate-bounce" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
@@ -199,32 +211,120 @@
         </div>
     </div>
 
+    <!-- Firebase Module -->
+    <script type="module">
+        import { auth, db } from '../firebase-config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+        import { doc, getDoc, collection, query, where, getDocs, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+
+        // Auth guard + data loading
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = '../index.html';
+                return;
+            }
+
+            try {
+                // Ambil data dari koleksi users (untuk role check)
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (!userDoc.exists() || userDoc.data().role !== 'siswa') {
+                    window.location.href = '../index.html';
+                    return;
+                }
+
+                // Ambil data dari koleksi siswa
+                const siswaDoc = await getDoc(doc(db, 'siswa', user.uid));
+                const siswaData = siswaDoc.exists() ? siswaDoc.data() : {};
+
+                // Set data ke Alpine.js
+                window._firebaseUserData = {
+                    uid: user.uid,
+                    nama: siswaData.nama_lengkap || userDoc.data().nama || 'Siswa',
+                    nisn: siswaData.nisn || userDoc.data().nisn || '-',
+                    kelas: siswaData.kelas || '-',
+                    jenis_kelamin: siswaData.jenis_kelamin || '',
+                };
+
+                // Cek absensi hari ini
+                const today = new Date().toISOString().split('T')[0]; // "2026-04-27"
+                const q = query(
+                    collection(db, 'presensi_siswa'),
+                    where('nisn', '==', siswaData.nisn),
+                    where('tanggal', '==', today)
+                );
+                const snapshot = await getDocs(q);
+                window._firebaseTodayAttendance = !snapshot.empty ? snapshot.docs[0].data() : null;
+
+                // Hitung statistik bulan ini
+                const monthStart = new Date();
+                monthStart.setDate(1);
+                const monthStr = monthStart.toISOString().split('T')[0];
+                
+                const qStats = query(
+                    collection(db, 'presensi_siswa'),
+                    where('nisn', '==', siswaData.nisn)
+                );
+                const statsSnap = await getDocs(qStats);
+                let stats = { hadir: 0, izin: 0, sakit: 0 };
+                statsSnap.forEach(d => {
+                    const s = d.data().status;
+                    if (s === 'hadir') stats.hadir++;
+                    else if (s === 'izin') stats.izin++;
+                    else if (s === 'sakit') stats.sakit++;
+                });
+                window._firebaseStats = stats;
+
+                // Trigger Alpine.js data ready
+                window.dispatchEvent(new CustomEvent('firebase-ready'));
+
+            } catch (e) {
+                console.error('Error loading data:', e);
+            }
+        });
+
+        // Fungsi untuk simpan absensi ke Firestore
+        window.firebaseSaveAttendance = async function() {
+            const data = window._firebaseUserData;
+            const today = new Date().toISOString().split('T')[0];
+            const now = new Date();
+
+            await addDoc(collection(db, 'presensi_siswa'), {
+                nisn: data.nisn,
+                nama: data.nama,
+                kelas: data.kelas,
+                status: 'hadir',
+                tanggal: today,
+                waktu_masuk: Timestamp.fromDate(now),
+                scan_method: 'qr'
+            });
+        };
+
+        // Logout function
+        window.firebaseLogout = async function() {
+            await signOut(auth);
+            localStorage.clear();
+            window.location.href = '../index.html';
+        };
+    </script>
+
     <script>
         function dashboard() {
             return {
                 isDark: false,
+                isLoadingPage: true,
                 userName: '',
                 studentId: '',
                 studentClass: '',
+                studentGender: '',
                 currentDate: '',
                 currentTime: '',
                 hasAttended: false,
                 attendedTime: '',
                 showScanner: false,
                 scanSuccess: false,
+                stats: { hadir: 0, izin: 0, sakit: 0 },
 
                 initDashboard() {
-                    // Cek Auth
-                    const role = localStorage.getItem('role');
-                    if (role !== 'student') {
-                        window.location.href = '../index.html';
-                        return;
-                    }
-
-                    this.userName = localStorage.getItem('user_name') || 'Siswa';
-                    this.studentId = localStorage.getItem('student_id') || '-';
-                    this.studentClass = localStorage.getItem('student_class') || '-';
-
                     // Cek Theme Preference
                     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                         this.isDark = true;
@@ -235,14 +335,40 @@
                     }
 
                     this.updateTime();
-                    setInterval(() => this.updateTime(), 60000); // update every minute
+                    setInterval(() => this.updateTime(), 60000);
+
+                    // Tunggu data dari Firebase
+                    window.addEventListener('firebase-ready', () => {
+                        const data = window._firebaseUserData;
+                        this.userName = data.nama;
+                        this.studentId = String(data.nisn);
+                        this.studentClass = data.kelas;
+                        this.studentGender = data.jenis_kelamin;
+
+                        // Cek absensi hari ini
+                        if (window._firebaseTodayAttendance) {
+                            this.hasAttended = true;
+                            const waktu = window._firebaseTodayAttendance.waktu_masuk;
+                            if (waktu && waktu.toDate) {
+                                this.attendedTime = waktu.toDate().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+                            } else {
+                                this.attendedTime = 'Tercatat';
+                            }
+                        }
+
+                        // Set statistik
+                        if (window._firebaseStats) {
+                            this.stats = window._firebaseStats;
+                        }
+
+                        this.isLoadingPage = false;
+                    });
                 },
 
                 updateTime() {
                     const now = new Date();
                     const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                     this.currentDate = now.toLocaleDateString('id-ID', optionsDate);
-                    
                     const optionsTime = { hour: '2-digit', minute: '2-digit' };
                     this.currentTime = now.toLocaleTimeString('id-ID', optionsTime) + ' WIB';
                 },
@@ -263,32 +389,34 @@
                 },
 
                 logout() {
-                    localStorage.removeItem('role');
-                    localStorage.removeItem('user_name');
-                    localStorage.removeItem('student_id');
-                    localStorage.removeItem('student_class');
-                    window.location.href = '../index.html';
+                    if (window.firebaseLogout) {
+                        window.firebaseLogout();
+                    }
                 },
 
                 openScanner() {
-                    if (this.hasAttended) return; // Kalau sudah absen, disable scanner (opsional)
-                    
+                    if (this.hasAttended) return;
                     this.showScanner = true;
                     this.scanSuccess = false;
 
-                    // Simulasi proses scanning (demo purpose)
-                    setTimeout(() => {
+                    // Simulasi proses scanning + simpan ke Firestore
+                    setTimeout(async () => {
                         if (this.showScanner) {
-                            this.scanSuccess = true;
-                            this.hasAttended = true;
-                            
-                            const now = new Date();
-                            this.attendedTime = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
-                            
-                            // Tutup modal setelah sukses
-                            setTimeout(() => {
+                            try {
+                                await window.firebaseSaveAttendance();
+                                this.scanSuccess = true;
+                                this.hasAttended = true;
+                                const now = new Date();
+                                this.attendedTime = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+                                this.stats.hadir++;
+
+                                setTimeout(() => {
+                                    this.closeScanner();
+                                }, 2000);
+                            } catch (e) {
+                                console.error('Gagal simpan absensi:', e);
                                 this.closeScanner();
-                            }, 2000);
+                            }
                         }
                     }, 2500);
                 },
