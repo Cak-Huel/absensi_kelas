@@ -9,115 +9,221 @@
     <style>body { font-family: 'Outfit', sans-serif; }</style>
 </head>
 <body class="bg-slate-50 min-h-screen p-6">
-    <div class="max-w-2xl mx-auto space-y-6">
+    <div class="max-w-3xl mx-auto space-y-6">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-bold text-slate-800">🌱 Seed Data Awal</h1>
-            <p class="text-slate-500 mt-2">Buat akun demo untuk testing login siswa</p>
+            <p class="text-slate-500 mt-2">Buat akun demo untuk testing login (Siswa, Guru, Admin)</p>
         </div>
 
-        <!-- Info -->
         <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-sm text-amber-800">
-            <strong>⚠️ Halaman ini hanya untuk development.</strong> Jalankan sekali saja untuk membuat akun demo. Setelah selesai, halaman ini bisa dihapus.
+            <strong>⚠️ Halaman ini hanya untuk development.</strong> Jalankan sekali saja. Jika akun sudah ada, akan dilewati otomatis.
         </div>
 
-        <!-- Akun yang akan dibuat -->
-        <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100">
-            <h2 class="font-bold text-lg mb-4">Akun Siswa Demo</h2>
+        <!-- Tab Selector -->
+        <div class="flex bg-slate-200 p-1 rounded-xl">
+            <button onclick="showTab('siswa')" id="tab-siswa" class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all bg-white shadow-sm text-slate-800">👩‍🎓 Siswa</button>
+            <button onclick="showTab('guru')" id="tab-guru" class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all text-slate-500">👨‍🏫 Guru</button>
+            <button onclick="showTab('admin')" id="tab-admin" class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all text-slate-500">🔑 Admin</button>
+        </div>
+
+        <!-- Siswa Table -->
+        <div id="panel-siswa" class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100">
+            <h2 class="font-bold text-lg mb-3">Akun Siswa Demo → koleksi <code class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">siswa</code></h2>
             <table class="w-full text-sm">
-                <thead><tr class="text-left text-slate-400 border-b"><th class="pb-2">Nama</th><th class="pb-2">NISN (Login)</th><th class="pb-2">Password</th><th class="pb-2">Kelas</th></tr></thead>
+                <thead><tr class="text-left text-slate-400 border-b"><th class="pb-2">Nama</th><th class="pb-2">NISN</th><th class="pb-2">Password</th><th class="pb-2">Kelas</th></tr></thead>
                 <tbody class="divide-y">
                     <tr><td class="py-2 font-medium">Ahmad Fauzi</td><td>12345</td><td>siswa123</td><td>XII IPA 1</td></tr>
                     <tr><td class="py-2 font-medium">Siti Nurhaliza</td><td>12346</td><td>siswa123</td><td>XII IPA 1</td></tr>
-                    <tr><td class="py-2 font-medium">Budi Santoso</td><td>12347</td><td>siswa123</td><td>XII IPA 1</td></tr>
+                    <tr><td class="py-2 font-medium">Budi Pratama</td><td>12347</td><td>siswa123</td><td>XII IPA 1</td></tr>
                 </tbody>
             </table>
+            <button onclick="seedSiswa()" id="btn-siswa" class="mt-4 w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow transition-all">🚀 Seed Siswa</button>
         </div>
 
-        <!-- Tombol Seed -->
-        <button id="btnSeed" onclick="runSeed()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-lg transition-all text-lg">
-            🚀 Jalankan Seeding
-        </button>
+        <!-- Guru Table -->
+        <div id="panel-guru" class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 hidden">
+            <h2 class="font-bold text-lg mb-3">Akun Guru Demo → koleksi <code class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs">users</code></h2>
+            <table class="w-full text-sm">
+                <thead><tr class="text-left text-slate-400 border-b"><th class="pb-2">Nama</th><th class="pb-2">Username</th><th class="pb-2">Password</th><th class="pb-2">Wali Kelas</th></tr></thead>
+                <tbody class="divide-y">
+                    <tr><td class="py-2 font-medium">Drs. Budi Santoso</td><td>budisantoso</td><td>guru123</td><td>XII IPA 1</td></tr>
+                    <tr><td class="py-2 font-medium">Siti Rahayu, S.Pd</td><td>sitirahayu</td><td>guru123</td><td>XII IPA 2</td></tr>
+                    <tr><td class="py-2 font-medium">Ahmad Wijaya, M.Pd</td><td>ahmadwijaya</td><td>guru123</td><td>XII IPS 1</td></tr>
+                </tbody>
+            </table>
+            <button onclick="seedGuru()" id="btn-guru" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow transition-all">🚀 Seed Guru</button>
+        </div>
+
+        <!-- Admin Table -->
+        <div id="panel-admin" class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 hidden">
+            <h2 class="font-bold text-lg mb-3">Akun Admin Demo → koleksi <code class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs">users</code></h2>
+            <table class="w-full text-sm">
+                <thead><tr class="text-left text-slate-400 border-b"><th class="pb-2">Nama</th><th class="pb-2">Username</th><th class="pb-2">Password</th><th class="pb-2">Level</th></tr></thead>
+                <tbody class="divide-y">
+                    <tr><td class="py-2 font-medium">Super Admin</td><td>admin</td><td>admin123</td><td>Super Admin</td></tr>
+                    <tr><td class="py-2 font-medium">Operator Sekolah</td><td>operator</td><td>admin123</td><td>Operator</td></tr>
+                </tbody>
+            </table>
+            <button onclick="seedAdmin()" id="btn-admin" class="mt-4 w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow transition-all">🚀 Seed Admin</button>
+        </div>
 
         <!-- Log Output -->
-        <div class="bg-slate-900 rounded-2xl p-6 text-sm font-mono text-slate-300 min-h-[200px]">
-            <div id="logOutput">Klik tombol di atas untuk mulai...<br></div>
+        <div class="bg-slate-900 rounded-2xl p-6 text-sm font-mono text-slate-300 min-h-[150px] max-h-[400px] overflow-y-auto">
+            <div id="logOutput">Pilih tab dan klik tombol Seed untuk mulai...<br></div>
         </div>
     </div>
+
+    <script>
+        function showTab(name) {
+            ['siswa','guru','admin'].forEach(t => {
+                document.getElementById('panel-' + t).classList.toggle('hidden', t !== name);
+                const tab = document.getElementById('tab-' + t);
+                if (t === name) {
+                    tab.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all bg-white shadow-sm text-slate-800';
+                } else {
+                    tab.className = 'flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all text-slate-500';
+                }
+            });
+        }
+    </script>
 
     <script type="module">
         import { auth, db } from './firebase-config.js';
         import { createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
-        import { collection, doc, setDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+        import { doc, setDoc } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
 
         const logEl = document.getElementById('logOutput');
-
         function log(msg, type = 'info') {
             const colors = { info: '#94a3b8', success: '#4ade80', error: '#f87171', warn: '#fbbf24' };
-            logEl.innerHTML += `<span style="color:${colors[type]}">${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warn' ? '⚠️' : '➡️'} ${msg}</span><br>`;
+            const icons = { info: '➡️', success: '✅', error: '❌', warn: '⚠️' };
+            logEl.innerHTML += `<span style="color:${colors[type]}">${icons[type]} ${msg}</span><br>`;
             logEl.scrollTop = logEl.scrollHeight;
         }
 
-        const siswaData = [
-            { nama_lengkap: "Ahmad Fauzi", nisn: 12345, kelas: "XII IPA 1", jenis_kelamin: "Laki-laki", no_hp_ortu: 81234567890, password: "siswa123" },
-            { nama_lengkap: "Siti Nurhaliza", nisn: 12346, kelas: "XII IPA 1", jenis_kelamin: "Perempuan", no_hp_ortu: 81234567891, password: "siswa123" },
-            { nama_lengkap: "Budi Santoso", nisn: 12347, kelas: "XII IPA 1", jenis_kelamin: "Laki-laki", no_hp_ortu: 81234567892, password: "siswa123" },
-        ];
+        async function createAccount(email, password, collectionName, docData) {
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, collectionName, cred.user.uid), docData);
+                await signOut(auth);
+                return { success: true, uid: cred.user.uid };
+            } catch (e) {
+                await signOut(auth).catch(() => {});
+                if (e.code === 'auth/email-already-in-use') {
+                    return { success: false, skipped: true };
+                }
+                throw e;
+            }
+        }
 
-        window.runSeed = async function() {
-            const btn = document.getElementById('btnSeed');
-            btn.disabled = true;
-            btn.textContent = '⏳ Sedang memproses...';
-            btn.classList.replace('bg-emerald-600', 'bg-slate-400');
+        // ===================== SEED SISWA =====================
+        window.seedSiswa = async function() {
+            const btn = document.getElementById('btn-siswa');
+            btn.disabled = true; btn.textContent = '⏳ Memproses...';
             logEl.innerHTML = '';
+            log('=== SEED SISWA ===');
 
-            log('Mulai seeding data siswa...');
+            const data = [
+                { nama_lengkap: "Ahmad Fauzi", nisn: 12345, kelas: "XII IPA 1", jenis_kelamin: "Laki-laki", no_hp_ortu: 81234567890 },
+                { nama_lengkap: "Siti Nurhaliza", nisn: 12346, kelas: "XII IPA 1", jenis_kelamin: "Perempuan", no_hp_ortu: 81234567891 },
+                { nama_lengkap: "Budi Pratama", nisn: 12347, kelas: "XII IPA 1", jenis_kelamin: "Laki-laki", no_hp_ortu: 81234567892 },
+            ];
 
-            for (const siswa of siswaData) {
-                const email = `${siswa.nisn}@siswa.absensi.id`;
-                log(`Membuat akun: ${siswa.nama_lengkap} (NISN: ${siswa.nisn})...`);
-
+            for (const s of data) {
+                log(`Membuat akun siswa: ${s.nama_lengkap} (NISN: ${s.nisn})...`);
                 try {
-                    // 1. Buat akun Firebase Auth
-                    const cred = await createUserWithEmailAndPassword(auth, email, siswa.password);
-                    log(`Auth berhasil: ${email}`, 'success');
-
-                    // 2. Simpan data ke koleksi siswa (pakai UID sebagai doc ID)
-                    const { password, ...firestoreData } = siswa;
-                    await setDoc(doc(db, 'siswa', cred.user.uid), firestoreData);
-                    log(`Firestore siswa berhasil: ${siswa.nama_lengkap}`, 'success');
-
-                    // 3. Simpan juga ke koleksi users (untuk mapping role)
-                    await setDoc(doc(db, 'users', cred.user.uid), {
-                        email: email,
-                        nama: siswa.nama_lengkap,
-                        role: 'siswa',
-                        nisn: siswa.nisn
+                    const email = `${s.nisn}@siswa.absensi.id`;
+                    const result = await createAccount(email, 'siswa123', 'siswa', {
+                        nama_lengkap: s.nama_lengkap,
+                        nisn: s.nisn,
+                        kelas: s.kelas,
+                        jenis_kelamin: s.jenis_kelamin,
+                        no_hp_ortu: s.no_hp_ortu
                     });
-                    log(`Firestore users berhasil`, 'success');
-
-                    // Sign out agar bisa buat akun berikutnya
-                    await signOut(auth);
-
-                } catch (e) {
-                    if (e.code === 'auth/email-already-in-use') {
-                        log(`Akun ${email} sudah ada — dilewati`, 'warn');
-                        await signOut(auth).catch(() => {});
+                    if (result.skipped) {
+                        log(`Akun ${s.nisn} sudah ada — dilewati`, 'warn');
                     } else {
-                        log(`Error: ${e.message}`, 'error');
+                        log(`Berhasil: ${s.nama_lengkap} → koleksi siswa`, 'success');
                     }
+                } catch (e) {
+                    log(`Error: ${e.message}`, 'error');
                 }
             }
+            log('Seed siswa selesai!', 'success');
+            btn.textContent = '✅ Selesai'; btn.disabled = false;
+        };
 
-            log('');
-            log('========================================');
-            log('Seeding selesai! Sekarang bisa login dengan:', 'success');
-            log('NISN: 12345 | Password: siswa123', 'success');
-            log('NISN: 12346 | Password: siswa123', 'success');
-            log('NISN: 12347 | Password: siswa123', 'success');
-            log('========================================');
+        // ===================== SEED GURU =====================
+        window.seedGuru = async function() {
+            const btn = document.getElementById('btn-guru');
+            btn.disabled = true; btn.textContent = '⏳ Memproses...';
+            logEl.innerHTML = '';
+            log('=== SEED GURU ===');
 
-            btn.textContent = '✅ Seeding Selesai!';
-            btn.classList.replace('bg-slate-400', 'bg-emerald-600');
+            const data = [
+                { nama: "Drs. Budi Santoso", username: "budisantoso", nip: "198001012005011001", wali_kelas: "XII IPA 1" },
+                { nama: "Siti Rahayu, S.Pd", username: "sitirahayu", nip: "198505152010012003", wali_kelas: "XII IPA 2" },
+                { nama: "Ahmad Wijaya, M.Pd", username: "ahmadwijaya", nip: "197903082006041002", wali_kelas: "XII IPS 1" },
+            ];
+
+            for (const g of data) {
+                log(`Membuat akun guru: ${g.nama} (${g.username})...`);
+                try {
+                    const email = `${g.username}@guru.absensi.id`;
+                    const result = await createAccount(email, 'guru123', 'users', {
+                        email: email,
+                        nama: g.nama,
+                        username: g.username,
+                        nip: g.nip,
+                        role: 'guru',
+                        wali_kelas: g.wali_kelas
+                    });
+                    if (result.skipped) {
+                        log(`Akun ${g.username} sudah ada — dilewati`, 'warn');
+                    } else {
+                        log(`Berhasil: ${g.nama} → koleksi users (role: guru)`, 'success');
+                    }
+                } catch (e) {
+                    log(`Error: ${e.message}`, 'error');
+                }
+            }
+            log('Seed guru selesai!', 'success');
+            btn.textContent = '✅ Selesai'; btn.disabled = false;
+        };
+
+        // ===================== SEED ADMIN =====================
+        window.seedAdmin = async function() {
+            const btn = document.getElementById('btn-admin');
+            btn.disabled = true; btn.textContent = '⏳ Memproses...';
+            logEl.innerHTML = '';
+            log('=== SEED ADMIN ===');
+
+            const data = [
+                { nama: "Super Admin", username: "admin", level: "Super Admin" },
+                { nama: "Operator Sekolah", username: "operator", level: "Operator" },
+            ];
+
+            for (const a of data) {
+                log(`Membuat akun admin: ${a.nama} (${a.username})...`);
+                try {
+                    const email = `${a.username}@admin.absensi.id`;
+                    const result = await createAccount(email, 'admin123', 'users', {
+                        email: email,
+                        nama: a.nama,
+                        username: a.username,
+                        role: 'admin',
+                        level: a.level
+                    });
+                    if (result.skipped) {
+                        log(`Akun ${a.username} sudah ada — dilewati`, 'warn');
+                    } else {
+                        log(`Berhasil: ${a.nama} → koleksi users (role: admin)`, 'success');
+                    }
+                } catch (e) {
+                    log(`Error: ${e.message}`, 'error');
+                }
+            }
+            log('Seed admin selesai!', 'success');
+            btn.textContent = '✅ Selesai'; btn.disabled = false;
         };
     </script>
 </body>

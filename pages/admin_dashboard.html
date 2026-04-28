@@ -233,20 +233,45 @@
         </div>
     </div>
 
+    <!-- Firebase Auth Guard -->
+    <script type="module">
+        import { auth, db } from '../firebase-config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = '../index.html';
+                return;
+            }
+            // Verifikasi role admin dari email
+            if (!user.email.endsWith('@admin.absensi.id')) {
+                window.location.href = '../index.html';
+                return;
+            }
+            // Ambil nama dari Firestore users
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+                localStorage.setItem('user_name', userDoc.data().nama);
+                window.dispatchEvent(new CustomEvent('firebase-admin-ready', { detail: userDoc.data() }));
+            }
+        });
+
+        window.firebaseLogout = async function() {
+            await signOut(auth);
+            localStorage.clear();
+            window.location.href = '../index.html';
+        };
+    </script>
+
     <script>
         function adminDashboard() {
             return {
                 isDark: false,
-                sidebarOpen: window.innerWidth >= 768, // Buka default di desktop
+                sidebarOpen: window.innerWidth >= 768,
                 userName: '',
 
                 initDashboard() {
-                    // Cek Auth
-                    const role = localStorage.getItem('role');
-                    if (role !== 'admin') {
-                        window.location.href = '../index.html';
-                        return;
-                    }
                     this.userName = localStorage.getItem('user_name') || 'Admin';
 
                     // Cek Theme
@@ -257,6 +282,11 @@
                         this.isDark = false;
                         document.documentElement.classList.remove('dark');
                     }
+
+                    // Update nama ketika Firebase ready
+                    window.addEventListener('firebase-admin-ready', (e) => {
+                        this.userName = e.detail.nama || 'Admin';
+                    });
 
                     // Init Charts
                     this.initCharts();
@@ -271,15 +301,12 @@
                         document.documentElement.classList.remove('dark');
                         localStorage.theme = 'light';
                     }
-                    // Update Chart Colors
                     if (window.siswaChartInstance) window.siswaChartInstance.update();
                     if (window.guruChartInstance) window.guruChartInstance.update();
                 },
 
                 logout() {
-                    localStorage.removeItem('role');
-                    localStorage.removeItem('user_name');
-                    window.location.href = '../index.html';
+                    if (window.firebaseLogout) window.firebaseLogout();
                 },
 
                 initCharts() {
@@ -291,22 +318,14 @@
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: {
-                                legend: { position: 'bottom' }
-                            },
+                            plugins: { legend: { position: 'bottom' } },
                             scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    grid: { color: this.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }
-                                },
-                                x: {
-                                    grid: { display: false }
-                                }
+                                y: { beginAtZero: true, grid: { color: this.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' } },
+                                x: { grid: { display: false } }
                             }
                         }
                     };
 
-                    // Siswa Chart Dummy Data
                     const ctxSiswa = document.getElementById('siswaChart').getContext('2d');
                     window.siswaChartInstance = new Chart(ctxSiswa, {
                         ...config,
@@ -320,7 +339,6 @@
                         }
                     });
 
-                    // Guru Chart Dummy Data
                     const ctxGuru = document.getElementById('guruChart').getContext('2d');
                     window.guruChartInstance = new Chart(ctxGuru, {
                         ...config,
